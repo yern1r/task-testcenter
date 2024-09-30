@@ -1,0 +1,15 @@
+{
+    "metalDetector":"Metal Detector",
+    "name":"name",
+    "yearOfProduction":"year of production",
+    "quantity":"quantity",
+    "countryOfProduction": "country of production",
+    "typeOFMetalDetector":"type of metal detector",
+    "availabilityStatus":"availability status",
+    "writeName":"Write a name",
+    "writeYearOfProduction":"Write the year of production",
+    "writeQuantity":"Write quantity",
+    "writeCountryOfProduction":"Select country of production",
+    "writeTypeOFMetalDetector":"Select a metal detector type",
+    "writeAvailabilityStatus": "Select Availability Status"
+}

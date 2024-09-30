@@ -1,0 +1,308 @@
+<div class="container">
+  <div class="wrapper">
+    <div class="content">
+      <div class="title">
+        <h1>{{ "metalDetector" | translate }}</h1>
+      </div>
+      <div class="lang">
+        <mat-form-field style="width: 180px !important">
+          <mat-label>{{ showLang }}</mat-label>
+          <mat-select>
+            <mat-option (click)="switchLang('ru')">РУС</mat-option>
+            <mat-option (click)="switchLang('kz')">ҚАЗ</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="fields">
+        <div class="finding">
+          <div class="search">
+            <mat-form-field
+              appearance="outline"
+              [formGroup]="form"
+              style="width: 305px !important"
+            >
+              <mat-label>{{ "name" | translate }}</mat-label>
+              <input
+                matInput
+                formControlName="name"
+                placeholder="{{ 'writeName' | translate }}"
+              />
+            </mat-form-field>
+            <button mat-button (click)="findMetalSearcher()">
+              {{ "search" | translate }}
+              <mat-icon>search</mat-icon>
+            </button>
+          </div>
+
+          <div class="toggle">
+            <mat-icon (click)="toggle()">tune</mat-icon>
+            <div
+              style="margin-top: 10px; display: flex; flex-direction: column"
+            >
+            <div style="display: flex; flex-direction: row; align-items: center;">
+                <mat-form-field [formGroup]="form" *ngIf="show">
+                <mat-label>{{
+                  "writeTypeOFMetalDetector" | translate
+                }}</mat-label>
+                <mat-select formControlName="type" [(ngModel)]="selectedTypeId">
+                  <mat-option *ngFor="let type of types" [value]="type.id">{{
+                    currentlanguage === "ru" ? type.nameRus : type.nameKaz
+                  }}</mat-option>
+                  <mat-option [value]="null">-</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+              
+              <button
+                *ngIf="show"
+                mat-button
+                (click)="filterByType(selectedTypeId)"
+              >
+                {{ "filter" | translate }}
+              </button>
+            </div>
+          </div>
+
+          <div class="result">
+            <div class="card" *ngFor="let item of response">
+              <div class="row">
+                <p>{{ "name" | translate }}</p>
+                <h4 style="text-align: right">{{ item.brand }}</h4>
+              </div>
+              <div class="row">
+                <p>{{ "typeOFMetalDetector" | translate }}</p>
+                <p style="text-align: right">
+                  {{
+                    currentlanguage === "ru"
+                      ? item.typeMetalDetectorsNameRus
+                      : item.typeMetalDetectorsNameKaz
+                  }}
+                </p>
+              </div>
+              <div class="row">
+                <p>{{ "countryOfProduction" | translate }}</p>
+                <p style="text-align: right">
+                  {{
+                    currentlanguage === "ru"
+                      ? item.countryManufactureNameRus
+                      : item.countryManufactureNameKaz
+                  }}
+                </p>
+              </div>
+              <div class="row">
+                <p>{{ "availabilityStatus" | translate }}</p>
+                <p style="text-align: right">
+                  {{
+                    currentlanguage === "ru"
+                      ? item.availabilityNameRus
+                      : item.availabilityNameKaz
+                  }}
+                </p>
+              </div>
+              <div class="row">
+                <p>{{ "yearOfProduction" | translate }}</p>
+                <p style="text-align: right">{{ item.yearIssue }}</p>
+              </div>
+              <div class="row">
+                <p>{{ "quantity" | translate }}</p>
+                <p style="text-align: right">{{ item.count }}</p>
+              </div>
+              <div class="actions">
+                <button
+                  mat-button
+                  style="background-color: limegreen; color: white"
+                  (click)="fillInfo(item.id)"
+                >
+                  {{ "edit" | translate}}
+                </button>
+                <button
+                  mat-button
+                  style="background-color: red; color: white"
+                  (click)="deleteDetector(item.id)"
+                >
+                  {{ "delete" | translate }}
+                </button>
+              </div>
+            </div>
+            <div class="overlay" *ngIf="editing" (click)="editing = false"></div>
+            <div class="editObject" *ngIf="editing">
+              <div class="toggle" *ngIf="showFormEdit">
+                <mat-form-field appearance="outline" [formGroup]="formToEdit">
+                  <mat-label>{{ "name" | translate }}</mat-label>
+                  <input
+                    matInput
+                    formControlName="brand"
+                    placeholder="{{ 'writeName' | translate }}"
+                  />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" [formGroup]="formToEdit">
+                  <mat-label>{{ "yearOfProduction" | translate }}</mat-label>
+                  <input
+                    matInput
+                    formControlName="yearIssue"
+                    placeholder="{{ 'writeYearOfProduction' | translate }}"
+                  />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" [formGroup]="formToEdit">
+                  <mat-label>{{ "quantity" | translate }}</mat-label>
+                  <input
+                    matInput
+                    formControlName="count"
+                    placeholder="{{ 'writeQuantity' | translate }}"
+                  />
+                </mat-form-field>
+
+                <mat-form-field [formGroup]="formToEdit">
+                  <mat-label>{{
+                    "writeCountryOfProduction" | translate
+                  }}</mat-label>
+                  <mat-select formControlName="countryManufactureId">
+                    <mat-option
+                      *ngFor="let country of countries"
+                      [value]="country.id"
+                      >{{
+                        currentlanguage === "ru"
+                          ? country.nameRus
+                          : country.nameKaz
+                      }}</mat-option
+                    >
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field [formGroup]="formToEdit">
+                  <mat-label>{{
+                    "writeAvailabilityStatus" | translate
+                  }}</mat-label>
+                  <mat-select formControlName="availabilityId">
+                    <mat-option
+                      *ngFor="let status of statuses"
+                      [value]="status.id"
+                      >{{
+                        currentlanguage === "ru"
+                          ? status.nameRus
+                          : status.nameKaz
+                      }}</mat-option
+                    >
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field [formGroup]="formToEdit">
+                  <mat-label>{{
+                    "writeTypeOFMetalDetector" | translate
+                  }}</mat-label>
+                  <mat-select formControlName="typeMetalDetectorsId">
+                    <mat-option *ngFor="let type of types" [value]="type.id">{{
+                      currentlanguage === "ru" ? type.nameRus : type.nameKaz
+                    }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <div style="display: flex; flex-direction: row; justify-content: end; gap: 10px;">
+                    <button
+                  (click)="edit(idToEdit)"
+                  mat-button
+                  style="background-color: cornflowerblue; color: white"
+                >
+                  {{ "save" | translate }}
+                </button>
+                <button
+                  (click)="close()"
+                  mat-button
+                  style="background-color: gray; color: white"
+                >
+                  {{ "close" | translate }}
+                </button>
+                </div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="addObject">
+          <div class="form" (click)="addNewObject()">
+            <p>{{ "addNew" | translate }}</p>
+            <mat-icon style="color: green">add</mat-icon>
+          </div>
+
+          <div class="toggle" *ngIf="showForm">
+            <mat-form-field appearance="outline" [formGroup]="formToAdd">
+              <mat-label>{{ "name" | translate }}</mat-label>
+              <input
+                matInput
+                formControlName="brand"
+                placeholder="{{ 'writeName' | translate }}"
+              />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" [formGroup]="formToAdd">
+              <mat-label>{{ "yearOfProduction" | translate }}</mat-label>
+              <input
+                matInput
+                formControlName="yearIssue"
+                placeholder="{{ 'writeYearOfProduction' | translate }}"
+              />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" [formGroup]="formToAdd">
+              <mat-label>{{ "quantity" | translate }}</mat-label>
+              <input
+                matInput
+                formControlName="count"
+                placeholder="{{ 'writeQuantity' | translate }}"
+              />
+            </mat-form-field>
+
+            <mat-form-field [formGroup]="formToAdd">
+              <mat-label>{{
+                "writeCountryOfProduction" | translate
+              }}</mat-label>
+              <mat-select formControlName="countryManufactureId">
+                <mat-option
+                  *ngFor="let country of countries"
+                  [value]="country.id"
+                  >{{
+                    currentlanguage === "ru" ? country.nameRus : country.nameKaz
+                  }}</mat-option
+                >
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field [formGroup]="formToAdd">
+              <mat-label>{{ "writeAvailabilityStatus" | translate }}</mat-label>
+              <mat-select formControlName="availabilityId">
+                <mat-option
+                  *ngFor="let status of statuses"
+                  [value]="status.id"
+                  >{{
+                    currentlanguage === "ru" ? status.nameRus : status.nameKaz
+                  }}</mat-option
+                >
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field [formGroup]="formToAdd">
+              <mat-label>{{
+                "writeTypeOFMetalDetector" | translate
+              }}</mat-label>
+              <mat-select formControlName="typeMetalDetectorsId">
+                <mat-option *ngFor="let type of types" [value]="type.id">{{
+                  currentlanguage === "ru" ? type.nameRus : type.nameKaz
+                }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <button
+              (click)="addNewOne()"
+              mat-button
+              style="background-color: cornflowerblue; color: white"
+            >
+              {{ "add" | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
